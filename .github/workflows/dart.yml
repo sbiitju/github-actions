@@ -1,68 +1,40 @@
-name: "Build"
+name: Build Flutter APK and AAB
 
 on:
-  pull_request:
-    branches:
-      - main
-      - test
   push:
-    branches:
-      - main
-      - test
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
 
-jobs:  
-  build:      
-    name: Build & Release 
-    runs-on: macos-latest 
+jobs:
+  build:
+    runs-on: ubuntu-latest
 
     steps:
-        #1 Checkout Repository
-      - name: Checkout Repository
-        uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-        #2 Setup Java
-      - name: Set Up Java
-        uses: actions/setup-java@v3.12.0
-        with:
-          distribution: 'oracle'
-          java-version: '17'
-
-        #3 Setup Flutter
-      - name: Set Up Flutter
+      - name: Set up Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: '3.29.2'
-          channel: 'stable'
+          flutter-version: 'stable'
 
-        #4 Install Dependencies
-      - name: Install Dependencies
+      - name: Install dependencies
         run: flutter pub get
 
-        #5 Setup Keystore
-     
+      - name: Run Flutter tests
+        run: flutter test
 
-        
-       #6 Building APK
       - name: Build APK
         run: flutter build apk --release
 
-        #7 Building App Bundle (aab)
-      - name: Build appBundle
-        run: flutter build appbundle
+      - name: Build AAB
+        run: flutter build appbundle --release
 
-        #8 Build IPA ( IOS Build )
-      - name: Build IPA
-        run: flutter build ipa --no-codesign
-
-
-        #9 Upload Artifacts
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v2
+      - name: Upload artifacts (APK & AAB)
+        uses: actions/upload-artifact@v3
         with:
-          name: Releases
+          name: flutter-build-artifacts
           path: |
             build/app/outputs/flutter-apk/app-release.apk
             build/app/outputs/bundle/release/app-release.aab
-            build/ios_build.tar.gz
-
-  
