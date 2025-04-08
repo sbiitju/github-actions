@@ -19,7 +19,6 @@ jobs:
         with:
           flutter-version: 'stable'
 
-
       - name: Install dependencies
         run: flutter pub get
 
